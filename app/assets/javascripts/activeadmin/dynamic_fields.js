@@ -36,57 +36,65 @@ function dfSetupField(el) {
   args.eq = el.data('eq');
   args.not = el.data('not');
   args.fn = el.data('function');
-  if(el.data('target')) target = el.closest('fieldset').find(el.data('target'));  // closest find for has many associations
-  else if(el.data('gtarget')) target = $(el.data('gtarget'));
-  if(action == 'hide') {
-    if(dfEvalCondition(el, args, false)) target.hide();
-    else target.show();
-    el.on('change', function(event) {
-      if(dfEvalCondition($(this), args, true)) target.hide();
+  args.cb = el.data('callback');
+  if(el.data('target')) {
+    target = el.closest('fieldset').find(el.data('target'));  // closest find for has many associations
+  }
+  else if(el.data('gtarget')) {
+    target = $(el.data('gtarget'));
+  }
+  if(action != undefined) {
+    if(action == 'hide') {
+      if(dfEvalCondition(el, args, false)) target.hide();
       else target.show();
-    });
-  }
-  else if(action == 'slide') {
-    if(dfEvalCondition(el, args, false)) target.slideDown();
-    else target.slideUp();
-    el.on('change', function(event) {
-      if(dfEvalCondition($(this), args, true)) target.slideDown();
-      else target.slideUp();
-    });
-  }
-  else if(action == 'fade') {
-    if(dfEvalCondition(el, args, false)) target.fadeIn();
-    else target.fadeOut();
-    el.on('change', function(event) {
-      if(dfEvalCondition($(this), args, true)) target.fadeIn();
-      else target.fadeOut();
-    });
-  }
-  else if(action.substr(0, 8) == 'setValue') {
-    var val = action.substr(8).trim();
-    if(dfEvalCondition(el, args, false)) dfSetValue(target, val);
-    el.on('change', function(event) {
-      if(dfEvalCondition($(this), args, true)) dfSetValue(target, val);
-    });
-  }
-  else if(action.substr(0, 8) == 'callback') {
-    var cb = action.substr(8).trim();
-    if(cb && window[cb]) {
-      if(dfEvalCondition(el, args, false)) window[cb](el.data('args'));
       el.on('change', function(event) {
-        if(dfEvalCondition($(this), args, true)) window[cb](el.data('args'));
+        if(dfEvalCondition($(this), args, true)) target.hide();
+        else target.show();
       });
     }
-    else console.log('Warning - activeadmin_dynamic_fields: ' + cb + '() not available [2]');
-  }
-  else if(action.substr(0, 8) == 'addClass') {
-    var classes = action.substr(8).trim();
-    if(dfEvalCondition(el, args, false)) target.removeClass(classes);
-    else target.addClass(classes);
-    el.on('change', function(event) {
-      if(dfEvalCondition($(this), args, true)) target.removeClass(classes);
+    else if(action == 'slide') {
+      if(dfEvalCondition(el, args, false)) target.slideDown();
+      else target.slideUp();
+      el.on('change', function(event) {
+        if(dfEvalCondition($(this), args, true)) target.slideDown();
+        else target.slideUp();
+      });
+    }
+    else if(action == 'fade') {
+      if(dfEvalCondition(el, args, false)) target.fadeIn();
+      else target.fadeOut();
+      el.on('change', function(event) {
+        if(dfEvalCondition($(this), args, true)) target.fadeIn();
+        else target.fadeOut();
+      });
+    }
+    else if(action.substr(0, 8) == 'setValue') {
+      var val = action.substr(8).trim();
+      if(dfEvalCondition(el, args, false)) dfSetValue(target, val);
+      el.on('change', function(event) {
+        if(dfEvalCondition($(this), args, true)) dfSetValue(target, val);
+      });
+    }
+    else if(action.substr(0, 8) == 'callback') {
+      var cb = action.substr(8).trim();
+
+      if(cb && window[cb]) {
+        if(dfEvalCondition(el, args, false)) window[cb](el);
+        el.on('change', function(event) {
+          if(dfEvalCondition($(this), args, true)) window[cb](el);
+        });
+      }
+      else console.log('Warning - activeadmin_dynamic_fields: ' + cb + '() not available [2]');
+    }
+    else if(action.substr(0, 8) == 'addClass') {
+      var classes = action.substr(8).trim();
+      if(dfEvalCondition(el, args, false)) target.removeClass(classes);
       else target.addClass(classes);
-    });
+      el.on('change', function(event) {
+        if(dfEvalCondition($(this), args, true)) target.removeClass(classes);
+        else target.addClass(classes);
+      });
+    }
   }
   else if(args.fn) {  // function without action
     dfEvalCondition(el, args, false);
